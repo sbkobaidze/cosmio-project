@@ -17,8 +17,6 @@ def login():
         user_data = UserLogin(**request.get_json())
         user = get_user(user_data.email, True)
 
-        print(user, 'User User')
-
         if not user or not check_password_hash(user['password'], user_data.password):
             error_response = APIResponse(success=False, message="Invalid credentials", errors=[{"message": "Invalid email or password"}])
             return jsonify(error_response.dict()), 401
@@ -36,7 +34,6 @@ def login():
         set_refresh_cookies(response, refresh_token)
 
         update_user(user['email'], user['sign_in_dates'] + [datetime.datetime.now().isoformat()], user['sign_in_count'] + 1)
-        print(" U DO NOT EVEN KNOW IT :) ")
 
         emit_global()
 
@@ -97,4 +94,4 @@ def protected():
     print('test')
     current_user = get_jwt_identity()
     print(current_user, 'test123')
-    return jsonify(APIResponse(success=True, message="User authenticated successfully", data={"email": current_user}).dict()), 200  # Fixed: proper dictionary structure
+    return jsonify(APIResponse(success=True, message="User authenticated successfully", data={"email": current_user}).dict()), 200
