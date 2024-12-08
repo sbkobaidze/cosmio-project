@@ -46,7 +46,7 @@ def update_user(email: str, sign_in_dates: list[str], sign_in_count: int):
 
 def get_all_users():
     try:
-        response = users_table.scan(ProjectionExpression='email, sign_in_dates, sign_in_count, #r', ExpressionAttributeNames={'#r': 'role'})
+        response = users_table.scan(ProjectionExpression='email, sign_in_dates, sign_in_count, #r', FilterExpression='sign_in_count > :count', ExpressionAttributeNames={'#r': 'role'}, ExpressionAttributeValues={':count': 0})
         return response.get('Items', [])
     except Exception as e:
         print(e)
