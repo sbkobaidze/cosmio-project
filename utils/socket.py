@@ -40,7 +40,6 @@ def emit_initial_update(socketio):
 
             personal = {**personal, 'sign_in_count': float(personal['sign_in_count'])}
             users = [{**user, 'sign_in_count': float(user['sign_in_count'])} for user in users]
-
             socketio.emit('users', {'global': users, 'personal': personal})
             return True
         except Exception as e:
