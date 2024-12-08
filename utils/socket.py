@@ -1,5 +1,5 @@
-from flask import Blueprint, current_app, jsonify, make_response, request
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required, set_access_cookies, set_refresh_cookies, unset_jwt_cookies, verify_jwt_in_request
+from flask import Blueprint, current_app
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from utils.db import get_all_users, get_user
 
 

@@ -1,4 +1,3 @@
-import os
 from datetime import timedelta
 
 from flask import Flask
@@ -37,7 +36,6 @@ def create_app(config_class=Config):
     return app, socketio
 
 
-# Create the application
 server_app, socketio = create_app()
 
 if __name__ == '__main__':

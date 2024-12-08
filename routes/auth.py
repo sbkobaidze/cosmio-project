@@ -1,7 +1,7 @@
 import datetime
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required, set_access_cookies, set_refresh_cookies, unset_jwt_cookies, verify_jwt_in_request
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required, set_access_cookies, set_refresh_cookies, unset_jwt_cookies, 
 from pydantic import ValidationError
 from utils.db import create_user, get_user, update_user
 from utils.schemas import APIResponse, UserLogin, UserRegister
