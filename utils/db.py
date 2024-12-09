@@ -50,60 +50,64 @@ def get_user(email: str, showPassword: Optional[bool] = False, count: int = 2, f
 
 
 def get_user_logins(email: Optional[str] = None, count: int = 2, from_date: Optional[str] = None, to_date: Optional[str] = None, page: int = 0):
-    base_params = {'Limit': count}
+    try:
+        base_params = {'Limit': count}
 
-    if email:
-        query_params = {
-            **base_params,
-            'ScanIndexForward': False,
-            'ProjectionExpression': '#d',
-            'ExpressionAttributeNames': {'#d': 'date'},
-        }
+        if email:
+            query_params = {
+                **base_params,
+                'ScanIndexForward': False,
+                'ProjectionExpression': '#d',
+                'ExpressionAttributeNames': {'#d': 'date'},
+            }
 
-        key_condition = Key('email').eq(email)
+            key_condition = Key('email').eq(email)
+            if from_date or to_date:
+                if from_date and to_date:
+                    key_condition = key_condition & Key('date').between(from_date, to_date)
+                elif from_date:
+                    key_condition = key_condition & Key('date').gte(from_date)
+                elif to_date:
+                    key_condition = key_condition & Key('date').lte(to_date)
+
+            query_params['KeyConditionExpression'] = key_condition
+
+            if page > 0:
+                for _ in range(page):
+                    response = sign_ins_table.query(**query_params)
+                    last_key = response.get('LastEvaluatedKey')
+                    if not last_key:
+                        break
+                    query_params['ExclusiveStartKey'] = last_key
+
+            return sign_ins_table.query(**query_params).get('Items', [])
+
+        scan_params = base_params.copy()
         if from_date or to_date:
-            if from_date and to_date:
-                key_condition = key_condition & Key('date').between(from_date, to_date)
-            elif from_date:
-                key_condition = key_condition & Key('date').gte(from_date)
-            elif to_date:
-                key_condition = key_condition & Key('date').lte(to_date)
+            filter_conditions = []
+            expression_values = {}
 
-        query_params['KeyConditionExpression'] = key_condition
+            if from_date:
+                filter_conditions.append('#date >= :from_date')
+                expression_values[':from_date'] = from_date
+            if to_date:
+                filter_conditions.append('#date <= :to_date')
+                expression_values[':to_date'] = to_date
+
+            scan_params.update({'FilterExpression': ' AND '.join(filter_conditions), 'ExpressionAttributeNames': {'#date': 'date'}, 'ExpressionAttributeValues': expression_values})
 
         if page > 0:
             for _ in range(page):
-                response = sign_ins_table.query(**query_params)
+                response = sign_ins_table.scan(**scan_params)
                 last_key = response.get('LastEvaluatedKey')
                 if not last_key:
                     break
-                query_params['ExclusiveStartKey'] = last_key
+                scan_params['ExclusiveStartKey'] = last_key
 
-        return sign_ins_table.query(**query_params).get('Items', [])
-
-    scan_params = base_params.copy()
-    if from_date or to_date:
-        filter_conditions = []
-        expression_values = {}
-
-        if from_date:
-            filter_conditions.append('#date >= :from_date')
-            expression_values[':from_date'] = from_date
-        if to_date:
-            filter_conditions.append('#date <= :to_date')
-            expression_values[':to_date'] = to_date
-
-        scan_params.update({'FilterExpression': ' AND '.join(filter_conditions), 'ExpressionAttributeNames': {'#date': 'date'}, 'ExpressionAttributeValues': expression_values})
-
-    if page > 0:
-        for _ in range(page):
-            response = sign_ins_table.scan(**scan_params)
-            last_key = response.get('LastEvaluatedKey')
-            if not last_key:
-                break
-            scan_params['ExclusiveStartKey'] = last_key
-
-    return sign_ins_table.scan(**scan_params).get('Items', [])
+        return sign_ins_table.scan(**scan_params).get('Items', [])
+    except Exception as e:
+        print(e)
+        raise e
 
 
 def update_user(email: str, sign_in_count: int):
