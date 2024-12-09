@@ -15,9 +15,15 @@ This is a Flask-based Python application with JWT authentication, WebSocket supp
 
 ### AWS DynamoDB Setup
 
-1. Create a DynamoDB table:
+1. Create a DynamoDB tables:
 
    - Table name: `users`
+   - Partition key: `email` (String)
+   - Region: [your-aws-region]
+
+   2.
+
+   - Table name: `sign_ins`
    - Partition key: `email` (String)
    - Region: [your-aws-region]
 
@@ -131,14 +137,3 @@ CORS(app, resources={r"/*": {"origins": ["http://localhost:5173"], "supports_cre
    - Verify AWS credentials are correctly set
    - Check if the table name matches exactly ('users')
    - Ensure the table exists in the specified AWS region
-
-## Contributing
-
-1. Fork the repository
-2. Create a new branch
-3. Make your changes
-4. Submit a pull request
-
-## License
-
-[Your chosen license]

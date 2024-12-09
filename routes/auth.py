@@ -33,9 +33,9 @@ def login():
         set_access_cookies(response, access_token)
         set_refresh_cookies(response, refresh_token)
 
-        update_user(user['email'], user['sign_in_dates'] + [datetime.datetime.now().isoformat()], user['sign_in_count'] + 1)
+        update_user(user['email'], user['sign_in_count'] + 1)
 
-        emit_global()
+        emit_global(user['email'])
 
         return response, 200
 

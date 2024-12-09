@@ -1,4 +1,4 @@
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, Optional, TypedDict, TypeVar
 
 from pydantic import BaseModel, EmailStr, constr
 
@@ -21,3 +21,10 @@ class APIResponse(BaseModel, Generic[T]):
     message: str
     data: Optional[T] = None
     errors: Optional[list[dict[str, Any]]] = None
+
+
+class IncomingFilterMessage(TypedDict):
+    type: str
+    pageSize: int
+    from_date: Optional[str]
+    to_date: Optional[str]
